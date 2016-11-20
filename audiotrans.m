@@ -49,7 +49,7 @@ for k=1:conf.nframes
     txbits = randi([0 1],conf.nbits,1);
     
     % TODO: Implement tx() Transmit Function
-    [txsignal conf] = tx(txbits,conf,k);
+    [txsignal, conf] = tx(txbits, conf, k);
     
     % % % % % % % % % % % %
     % Begin

@@ -110,6 +110,7 @@ for k=1:conf.nframes
     elseif strcmp(conf.audiosystem,'bypass')
         rawrxsignal = rawtxsignal(:,1);
         rxsignal    = rawrxsignal;
+        rxsignal = awgn(rxsignal,-100); 
     end
     
     % Plot received signal for debgging

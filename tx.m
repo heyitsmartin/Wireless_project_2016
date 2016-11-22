@@ -17,20 +17,21 @@ f_c = conf.f_c;
 f_s = conf.f_s;
 os_factor = conf.os_factor;
 
-preamble = lfsr_framesync(conf.npreamble);
-signal = qpsk_mapper([preamble; txbits]); 
+preamble = 1 - 2*lfsr_framesync(conf.npreamble);
+
+signal = [preamble ; qpsk_mapper( txbits)];       % bpsk preamble
 signal = upsample(signal, os_factor);
 
 time = linspace(1, 1+length(signal)/f_s, length(signal));
 
-sig_im = sin(2*pi*f_c*time);
 sig_re = cos(2*pi*f_c*time);
+sig_im = sin(2*pi*f_c*time);
 
 ps_filter = rrc(os_factor, 0.22, 20);
 
 txsignal = conv(signal, ps_filter, 'same');
-txsignal = txsignal .* transp(exp(2*pi*1i*f_c*time));
-% txsignal = sig_re'.*real(txsignal) - sig_im'.*imag(txsignal);
+%txsignal = txsignal .* transp(exp(2*pi*1i*f_c*time));
+txsignal = sig_re'.*real(txsignal) - sig_im'.*imag(txsignal);
 
 
 

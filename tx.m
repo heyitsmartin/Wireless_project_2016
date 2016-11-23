@@ -29,9 +29,9 @@ sig_re = cos(2*pi*f_c*time);
 ps_filter = rrc(os_factor, 0.22, 20);
 
 txsignal = conv(signal, ps_filter, 'same');
-txsignal = sig_re'.*real(txsignal) - sig_im'.*imag(txsignal);
+txsignal = txsignal .* transp(exp(2*pi*1i*f_c*time));
+% txsignal = sig_re'.*real(txsignal) - sig_im'.*imag(txsignal);
 
-fprintf('asd');
 
 
 

@@ -20,10 +20,11 @@ nsyms = conf.nsyms;
 os_factor = conf.os_factor;
 
 time = linspace(1, 1+length(rxsignal)/f_s, length(rxsignal));
-rx_comp = rxsignal .* transp(exp(-2*1i*f_c*time));
+rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));
+rx_bb = 2 * lowpass(rx_comp, conf);
 
 ps_filter = rrc(os_factor, 0.22, 20);
-rx_matched = conv(rx_comp, ps_filter, 'same');
+rx_matched = conv(rx_bb, ps_filter, 'same');
 [beginning_of_data, phase_of_peak, ~] = frame_sync(rx_matched, os_factor);
 
 rxbits = rx_matched(beginning_of_data:beginning_of_data+nsyms*os_factor-1);

@@ -13,14 +13,15 @@ function [rxbits conf] = rx(rxsignal,conf,k)
 %   rxbits      : received bits
 %   conf        : configuration structure
 %
-
+%phase correction
 f_c = conf.f_c;
 f_s = conf.f_s;
 nsyms = conf.nsyms;
 os_factor = conf.os_factor;
 
 time = linspace(1, 1+length(rxsignal)/f_s, length(rxsignal));
-rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));
+rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));       % down freq conv
+%rx_comp = 0.5 * rxsignal + 0.5 *(real(rxsignal) - imag(rxsignal) ).*(exp(-4*pi*f_c*time)); %down freq conv
 rx_bb = 2 * lowpass(rx_comp, conf);
 
 ps_filter = rrc(os_factor, 0.22, 20);
@@ -28,5 +29,6 @@ rx_matched = conv(rx_bb, ps_filter, 'same');
 [beginning_of_data, phase_of_peak, ~] = frame_sync(rx_matched, os_factor);
 
 rxbits = rx_matched(beginning_of_data:beginning_of_data+nsyms*os_factor-1);
-rxbits = demapper(downsample(rxbits, os_factor));
+downsampled = downsample(rxbits, os_factor);
+rxbits = demapper(downsampled);
 

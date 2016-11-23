@@ -28,7 +28,7 @@ ps_filter = rrc(os_factor, 0.22, 20);
 rx_matched = conv(rx_bb, ps_filter, 'same');
 [beginning_of_data, phase_of_peak, ~] = frame_sync(rx_matched, os_factor);
 
-rxbits = rx_matched(beginning_of_data:beginning_of_data+nsyms*os_factor-1);
-downsampled = downsample(rxbits, os_factor);
-rxbits = demapper(downsampled);
+[rxbits, ~] = phase_correction(rx_matched, nsyms, beginning_of_data, os_factor, phase_of_peak);
+
+rxbits = demapper(rxbits);
 

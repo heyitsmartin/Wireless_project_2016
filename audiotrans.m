@@ -17,7 +17,7 @@ conf.f_s     = 48000;   % sampling rate
 conf.f_sym   = 100;     % symbol rate
 conf.nframes = 1;       % number of frames to transmit
 conf.nbits   = 2000;    % number of bits 
-conf.modulation_order = 2; % BPSK:1, QPSK:2
+conf.modulation_order = 1; % BPSK:1, QPSK:2
 conf.f_c     = 4000;
 
 conf.npreamble  = 100;

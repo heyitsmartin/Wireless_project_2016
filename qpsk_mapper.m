@@ -1,4 +1,4 @@
-function symbols = map(bits)
+function symbols = qpsk_mapper(bits)
 
 % Map symbols
 symbols = ((2*bits(1:2:end)-1) + 1j*(2*bits(2:2:end)-1));

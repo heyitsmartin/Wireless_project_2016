@@ -25,7 +25,7 @@ ofdm_signal = [];
 % User our lfsr to generate a training OFDM symbol.
 txbits = [lfsr_framesync(nSubCarrier*modulation_order); txbits];
 
-preamble = 1 - 2*lfsr_framesync(conf.npreamble);
+preamble = 1 - 2*lfsr_framesync(conf.npreamble); % BPSK
 
 if (modulation_order == 1)
     mapped = bpsk_mapper(txbits);
@@ -35,8 +35,8 @@ end
 
 ofdm_start_idx = 1;
 for i = 1:nOfdmSyms+1
-    qpsk_symbols = mapped(ofdm_start_idx:ofdm_start_idx+nSubCarrier-1);
-    ofdm_symbol = osifft(qpsk_symbols, ofdm_os_factor);
+    mapped_symbols = mapped(ofdm_start_idx:ofdm_start_idx+nSubCarrier-1);
+    ofdm_symbol = osifft(mapped_symbols, ofdm_os_factor);
     ofdm_signal = [ofdm_signal; ofdm_symbol(1/2*length(ofdm_symbol)+1:end); ofdm_symbol]; % ofdm symbol with guard interval
     ofdm_start_idx = ofdm_start_idx + nSubCarrier;
 end

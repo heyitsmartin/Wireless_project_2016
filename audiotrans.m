@@ -20,8 +20,8 @@ conf.modulation_order = 2;       % BPSK:1, QPSK:2
 conf.f_c              = 8000;
 
 % OFDM Params
-conf.spacing          = 10;
-conf.nSubCarrier      = 480;
+conf.spacing          = 9.375;
+conf.nSubCarrier      = 256;
 conf.nOfdmSyms        = 1;
 conf.ofdm_os_factor   = conf.f_s / (conf.spacing * conf.nSubCarrier);
 
@@ -30,6 +30,8 @@ conf.nbits = conf.modulation_order * conf.nOfdmSyms * conf.nSubCarrier;    % num
 conf.npreamble  = 100; 
 conf.bitsps     = 16;   % bits per audio sample
 conf.offset     = 0;
+
+conf.training   = genpreamble(conf.nSubCarrier*conf.modulation_order);
 
 % Init Section
 % all calculations that you only have to do once

@@ -23,9 +23,9 @@ nSubCarrier = conf.nSubCarrier;
 ofdm_signal = [];
 
 % User our lfsr to generate a training OFDM symbol.
-txbits = [lfsr_framesync(nSubCarrier*modulation_order); txbits];
+txbits = [conf.training; txbits];
 
-preamble = 1 - 2*lfsr_framesync(conf.npreamble); % BPSK
+preamble = 1 - 2*genpreamble(conf.npreamble); % BPSK
 
 if (modulation_order == 1)
     mapped = bpsk_mapper(txbits);
@@ -44,7 +44,7 @@ end
 % signal = [preamble; mapped];       % bpsk preamble
 % signal = upsample(signal, os_factor);
 
-ps_filter = rrc(os_factor, 0.22, 20);
+ps_filter = rrc(os_factor, 0.22, 10*os_factor);
 % upsample preamble separately because we don't perform IDFT on it.
 preamble_ = upsample(preamble, os_factor); 
 preamble = conv(preamble_, ps_filter, 'same');

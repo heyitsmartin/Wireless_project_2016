@@ -28,11 +28,11 @@ time = linspace(1, 1+length(rxsignal)/f_s, length(rxsignal));
 rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));       % down freq conv
 
 % rx_bb = 2 * lowpass(rx_comp, conf);
-rx_bb = 2 * ofdmlowpass(rx_comp, conf, 2000);
+rx_bb = ofdmlowpass(rx_comp, conf, 2000);
 
-% ps_filter = rrc(os_factor, 0.22, 20);
-% rx_matched = conv(rx_bb, ps_filter, 'same');
-[beginning_of_data, ~, ~] = frame_sync(rx_bb, os_factor);
+ps_filter = rrc(os_factor, 0.22, 10*os_factor);
+rx_matched = conv(rx_bb, ps_filter, 'same');
+[beginning_of_data, ~, ~] = frame_sync(rx_matched, os_factor);
 window_len = nSubCarrier * ofdm_os_factor;
 for i = 1:nOfdmSyms+1
     beginning_of_data = beginning_of_data + window_len / 2; % skip over cyclic prefix

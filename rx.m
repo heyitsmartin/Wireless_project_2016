@@ -23,6 +23,8 @@ ofdm_os_factor = conf.ofdm_os_factor;
 nOfdmSyms = conf.nOfdmSyms;
 nSubCarrier = conf.nSubCarrier;
 spacing = conf.spacing;
+channel_offsets = zeros(nSubCarrier, 1);
+rxbits = [];
 
 time = linspace(1, 1+length(rxsignal)/f_s, length(rxsignal));
 rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));       % down freq conv
@@ -39,6 +41,13 @@ for i = 1:nOfdmSyms+1
     end_of_symbol = beginning_of_data + window_len - 1;
     ofdm_symbol = rx_bb(beginning_of_data:end_of_symbol);
     mapped_bits = osfft(ofdm_symbol, ofdm_os_factor);
+    if i == 1
+        training = conf.training;
+        channel_offsets = mapped_bits ./ qpsk_mapper(training);
+    else
+        mapped_bits = mapped_bits ./ channel_offsets;
+        rxbits = [rxbits; mapped_bits];
+    end
     beginning_of_data = end_of_symbol;
 end
 % [rxbits, ~] = phase_correction(rx_matched, nsyms, beginning_of_data, os_factor, phase_of_peak);

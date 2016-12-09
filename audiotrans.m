@@ -11,7 +11,7 @@
 %   - 'bypass' : no audio transmission, takes txsignal as received signal
 
 % Configuration Values
-conf.audiosystem = 'bypass'; % Values: 'matlab','native','bypass'
+conf.audiosystem = 'matlab'; % Values: 'matlab','native','bypass'
 
 conf.f_s              = 48000;   % sampling rate  
 conf.f_sym            = 100;     % symbol rate
@@ -117,7 +117,8 @@ for k=1:conf.nframes
     elseif strcmp(conf.audiosystem,'bypass')
         rawrxsignal = rawtxsignal(:,1);
         rxsignal    = rawrxsignal;
-        rxsignal = awgn(rxsignal,10); 
+        % rxsignal = awgn(rxsignal,100); 
+        
     end
     
     % Plot received signal for debgging

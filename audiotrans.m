@@ -13,16 +13,25 @@
 % Configuration Values
 conf.audiosystem = 'matlab'; % Values: 'matlab','native','bypass'
 
-conf.f_s     = 48000;   % sampling rate  
-conf.f_sym   = 100;     % symbol rate
-conf.nframes = 1;       % number of frames to transmit
-conf.nbits   = 2000;    % number of bits 
-conf.modulation_order = 1; % BPSK:1, QPSK:2
-conf.f_c     = 4000;
+conf.f_s              = 48000;   % sampling rate  
+conf.f_sym            = 100;     % symbol rate
+conf.nframes          = 1;       % number of frames to transmit
+conf.modulation_order = 2;       % BPSK:1, QPSK:2
+conf.f_c              = 8000;
 
-conf.npreamble  = 100;
+% OFDM Params
+conf.spacing          = 9.375;
+conf.nSubCarrier      = 256;
+conf.nOfdmSyms        = 1;
+conf.ofdm_os_factor   = conf.f_s / (conf.spacing * conf.nSubCarrier);
+
+conf.nbits = conf.modulation_order * conf.nOfdmSyms * conf.nSubCarrier;    % number of bits 
+
+conf.npreamble  = 100; 
 conf.bitsps     = 16;   % bits per audio sample
 conf.offset     = 0;
+
+conf.training   = genpreamble(conf.nSubCarrier*conf.modulation_order);
 
 % Init Section
 % all calculations that you only have to do once
@@ -39,9 +48,7 @@ res.rxnbits     = zeros(conf.nframes,1);
 % TODO: To speed up your simulation pregenerate data you can reuse
 % beforehand.
 
-
 % Results
-
 
 for k=1:conf.nframes
     
@@ -110,7 +117,8 @@ for k=1:conf.nframes
     elseif strcmp(conf.audiosystem,'bypass')
         rawrxsignal = rawtxsignal(:,1);
         rxsignal    = rawrxsignal;
-        rxsignal = awgn(rxsignal,10); 
+        % rxsignal = awgn(rxsignal,100); 
+        
     end
     
     % Plot received signal for debgging

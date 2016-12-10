@@ -37,7 +37,11 @@ ofdm_start_idx = 1;
 for i = 1:nOfdmSyms+1
     mapped_symbols = mapped(ofdm_start_idx:ofdm_start_idx+nSubCarrier-1);
     ofdm_symbol = osifft(mapped_symbols, ofdm_os_factor);
-    ofdm_signal = [ofdm_signal; ofdm_symbol(1/2*length(ofdm_symbol)+1:end); ofdm_symbol]; % ofdm symbol with guard interval
+    start_idx = floor((1-conf.guard_factor)*length(ofdm_symbol));
+    if conf.guard_factor == 1
+        start_idx = 1;
+    end
+    ofdm_signal = [ofdm_signal; ofdm_symbol(start_idx:end); ofdm_symbol]; % ofdm symbol with guard interval
     ofdm_start_idx = ofdm_start_idx + nSubCarrier;
 end
 

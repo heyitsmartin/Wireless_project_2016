@@ -22,6 +22,7 @@ modulation_order = conf.modulation_order; % BPSK:1, QPSK:2
 ofdm_os_factor = conf.ofdm_os_factor;
 nOfdmSyms = conf.nOfdmSyms;
 nSubCarrier = conf.nSubCarrier;
+nTrainSyms = conf.nTrainSyms;
 spacing = conf.spacing;
 channel_offsets = zeros(nSubCarrier, 1);
 rxbits = [];
@@ -29,26 +30,28 @@ rxbits = [];
 time = linspace(1, 1+length(rxsignal)/f_s, length(rxsignal));
 rx_comp = rxsignal .* transp(exp(-2*1i*pi*f_c*time));       % down freq conv
 
-% rx_bb = 2 * lowpass(rx_comp, conf);
 rx_bb = ofdmlowpass(rx_comp, conf, 2000);
 
 ps_filter = rrc(os_factor, 0.22, 10*os_factor);
 rx_matched = conv(rx_bb, ps_filter, 'same');
 [beginning_of_data, ~, ~] = frame_sync(rx_matched, os_factor);
 window_len = nSubCarrier * ofdm_os_factor;
-for i = 1:nOfdmSyms+1
+for i = 1:nOfdmSyms+nTrainSyms
     beginning_of_data = beginning_of_data + floor(conf.guard_factor * window_len); % skip over cyclic prefix
     end_of_symbol = beginning_of_data + window_len - 1;
     ofdm_symbol = rx_bb(beginning_of_data:end_of_symbol);
     mapped_bits = osfft(ofdm_symbol, ofdm_os_factor);
-    if i == 1
+    a = sum(conf.training ~= qpsk_demapper(mapped_bits));
+    % fprintf('i = %d, diff = %d\n', i, a);
+    if sum(i == conf.trainSymIdx) > 0 
+        % If trainSymIdx includes this OFDM symbol index, its a training symbol
         training = conf.training;
         channel_offsets = mapped_bits ./ qpsk_mapper(training);
     else
         mapped_bits = mapped_bits ./ channel_offsets;
         rxbits = [rxbits; mapped_bits];
     end
-    beginning_of_data = end_of_symbol;
+    beginning_of_data = end_of_symbol + 1;
 end
 % [rxbits, ~] = phase_correction(rx_matched, nsyms, beginning_of_data, os_factor, phase_of_peak);
 

@@ -41,8 +41,8 @@ for i = 1:nOfdmSyms+nTrainSyms
     end_of_symbol = beginning_of_data + window_len - 1;
     ofdm_symbol = rx_bb(beginning_of_data:end_of_symbol);
     mapped_bits = osfft(ofdm_symbol, ofdm_os_factor);
+    
     a = sum(conf.training ~= qpsk_demapper(mapped_bits));
-    % fprintf('i = %d, diff = %d\n', i, a);
     if sum(i == conf.trainSymIdx) > 0 
         % If trainSymIdx includes this OFDM symbol index, its a training symbol
         training = conf.training;
@@ -50,9 +50,16 @@ for i = 1:nOfdmSyms+nTrainSyms
     else
         mapped_bits = mapped_bits ./ channel_offsets;
         rxbits = [rxbits; mapped_bits];
+        % Constellation plot
+%         if (mod(i,50) == 2)
+%             scatter(real(mapped_bits), imag(mapped_bits), 'MarkerFaceColor', rand(1,3));
+%             figure
+%             title(sprintf('i = %d',i));
+%         end
     end
     beginning_of_data = end_of_symbol + 1;
 end
+
 % [rxbits, ~] = phase_correction(rx_matched, nsyms, beginning_of_data, os_factor, phase_of_peak);
 
 if (modulation_order == 1)
